@@ -32,23 +32,22 @@ const PostCommentContainer = styled.div`
   margin-top: 10px;
   padding: 15px 0px 10px 0px;
   border-top: 1px solid ${(props) => props.theme.borderColor};
-`
+`;
 
 const PostCommentInput = styled.input`
   width: 100%;
   &::placeholder {
     font-size: 12px;
   }
-`
+`;
 
 function Comments({ photoId, author, caption, commentNumber, comments }) {
-  const {data: userData} = useUser()
+  const { data: userData } = useUser();
   const { register, handleSubmit, setValue, getValues } = useForm();
-  
-  
+
   const createCommentUpdate = (cache, result) => {
     const { payload } = getValues();
-    setValue("payload", "")
+    setValue("payload", "");
     const {
       data: {
         createComment: { ok, id },
@@ -56,7 +55,6 @@ function Comments({ photoId, author, caption, commentNumber, comments }) {
     } = result;
 
     if (ok && userData?.me) {
-      
       const newComment = {
         __typename: "Comment",
         createdAt: Date.now() + "",
@@ -64,13 +62,13 @@ function Comments({ photoId, author, caption, commentNumber, comments }) {
         isMine: true,
         payload,
         user: {
-          ...userData.me
-        }
+          ...userData.me,
+        },
       };
 
       const newCacheComment = cache.writeFragment({
         data: newComment,
-        fragment: gql `
+        fragment: gql`
           fragment commentcache on Comment {
             id
             createdAt
@@ -81,19 +79,19 @@ function Comments({ photoId, author, caption, commentNumber, comments }) {
               avatar
             }
           }
-        `
-      })
+        `,
+      });
       cache.modify({
         id: `Photo:${photoId}`,
         fields: {
           comments(prev) {
-            return [...prev, newCacheComment]
+            return [...prev, newCacheComment];
           },
           commentNumber(prev) {
-            return prev + 1
-          }
-        }
-      })
+            return prev + 1;
+          },
+        },
+      });
     }
   };
 
@@ -115,9 +113,7 @@ function Comments({ photoId, author, caption, commentNumber, comments }) {
         payload,
       },
     });
-    
   };
-  
 
   return (
     <CommentsContainer>
